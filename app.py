@@ -109,10 +109,11 @@ st.markdown("""
     }
 
     /* Remove Top Padding & Hide Header Decoration */
+    /* Adjust Top Padding for Streamlit Cloud Toolbar */
     .block-container {
-        padding-top: 0rem !important;
+        padding-top: 3rem !important; /* Give space for the toolbar */
         padding-bottom: 1rem !important;
-        margin-top: -20px !important;
+        margin-top: 0 !important;
     }
     
     header[data-testid="stHeader"] {
