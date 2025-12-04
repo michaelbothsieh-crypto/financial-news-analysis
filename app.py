@@ -376,7 +376,7 @@ else:
                 
                 # Action Button
                 btn_key = f"trend_btn_{hash(item['title'])}"
-                if st.button("⚡ 分析", key=btn_key, use_container_width=True):
+                if st.button("⚡ 分析", key=btn_key, use_container_width=True, disabled=not has_api_key):
                     st.session_state['url_input'] = item['link']
                     st.session_state['trigger_analysis'] = True
                     st.rerun()
