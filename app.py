@@ -2,100 +2,143 @@ import streamlit as st
 from financial_analyzer import FinancialAnalyzer
 import plotly.graph_objects as go
 import time
+import os
 
-st.set_page_config(page_title="財經新聞智能分析系統", layout="wide", page_icon="📈")
+st.set_page_config(page_title="Financial Insights AI", layout="wide", page_icon="⚡")
 
-# Custom CSS for Premium Design
+# Custom CSS for Neo-Modern "Independent Designer" Aesthetic
 st.markdown("""
 <style>
-    /* Global Styles */
-    .stApp {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        color: #e2e8f0;
-        font-family: 'Inter', sans-serif;
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+    /* Global Reset & Typography */
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
     
+    /* Background & Main Container */
+    .stApp {
+        background-color: #020617;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+            linear-gradient(#0f172a 1px, transparent 1px),
+            linear-gradient(90deg, #0f172a 1px, transparent 1px);
+        background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        color: #f8fafc;
+    }
+
     /* Headings */
     h1, h2, h3 {
         color: #f8fafc !important;
-        font-weight: 700 !important;
+        letter-spacing: -0.02em;
     }
     
-    /* Cards/Containers */
-    .css-1r6slb0, .stExpander {
-        background: rgba(30, 41, 59, 0.7);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(148, 163, 184, 0.1);
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    h1 {
+        font-weight: 800 !important;
+        background: linear-gradient(to right, #f8fafc, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Bento Grid Cards */
+    .css-1r6slb0, .stExpander, .info-card {
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        border-radius: 24px;
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease, border-color 0.2s ease;
     }
     
-    /* Buttons */
+    .info-card:hover {
+        border-color: rgba(139, 92, 246, 0.3);
+        transform: translateY(-2px);
+    }
+
+    /* Primary Button */
     .stButton>button {
         width: 100%;
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         color: white;
         font-weight: 600;
-        border-radius: 12px;
-        height: 50px;
-        border: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
+        border-radius: 16px;
+        height: 56px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    
     .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.6);
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.5);
+        border-color: rgba(255, 255, 255, 0.3);
     }
-    
-    /* Inputs */
+
+    /* Input Fields */
     .stTextInput>div>div>input {
-        background-color: rgba(30, 41, 59, 0.5);
-        color: white;
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 12px;
-        padding: 10px 15px;
+        background-color: rgba(15, 23, 42, 0.8);
+        color: #f8fafc;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 16px;
+        padding: 12px 20px;
+        font-size: 16px;
+        transition: all 0.2s ease;
     }
+    
     .stTextInput>div>div>input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        background-color: rgba(15, 23, 42, 1);
     }
-    
-    /* Metrics/Info Cards */
+
+    /* Info Card Specifics */
     .info-card {
-        background: rgba(51, 65, 85, 0.5);
-        border-radius: 12px;
-        padding: 15px;
-        border: 1px solid rgba(148, 163, 184, 0.1);
-        margin-bottom: 10px;
+        padding: 24px;
+        margin-bottom: 16px;
+        height: 100%;
     }
     
+    .info-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #f1f5f9;
+        line-height: 1.4;
+    }
+
     /* Scrollbar */
     ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
     }
     ::-webkit-scrollbar-track {
-        background: #0f172a; 
+        background: transparent; 
     }
     ::-webkit-scrollbar-thumb {
-        background: #475569; 
-        border-radius: 4px;
+        background: rgba(148, 163, 184, 0.2); 
+        border-radius: 3px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: #64748b; 
+        background: rgba(148, 163, 184, 0.4); 
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Header
-col_header_1, col_header_2 = st.columns([1, 5])
-with col_header_1:
-    st.image("https://cdn-icons-png.flaticon.com/512/2534/2534204.png", width=80)
-with col_header_2:
-    st.title("財經新聞智能分析系統")
-    st.markdown("#### 🚀 AI 驅動的深度市場洞察")
-st.markdown("---")
+# Header Section
+st.markdown('<div style="margin-bottom: 40px; text-align: center;">', unsafe_allow_html=True)
+st.title("Financial Insights AI")
+st.markdown('<p style="color: #94a3b8; font-size: 1.2rem; margin-top: -10px;">Next-Gen Market Intelligence</p>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Initialize Analyzer
 @st.cache_resource
@@ -107,122 +150,128 @@ def get_analyzer_v3():
 
 analyzer = get_analyzer_v3()
 
-# Main Layout
-col1, col2 = st.columns([1, 1])
+# Main Layout - Centered Search
+col_main_1, col_main_2, col_main_3 = st.columns([1, 2, 1])
 
-with col1:
-    st.subheader("📰 新聞來源")
-    url_input = st.text_input("請輸入財經新聞連結 (URL)", placeholder="https://finance.yahoo.com/...")
-    
-    analyze_btn = st.button("🚀 開始智能分析", type="primary")
-    
-    if analyze_btn and url_input:
-        with st.status("正在處理中...", expanded=True) as status:
-            st.write("🌐 正在抓取網頁內容...")
-            news_text = analyzer.fetch_news_from_url(url_input)
-            
-            if news_text.startswith("Error"):
-                status.update(label="❌ 抓取失敗", state="error")
-                st.error(news_text)
-            else:
-                st.write("🧠 正在進行情緒分析...")
-                sentiment_label, sentiment_score = analyzer.analyze_sentiment(news_text)
-                
-                st.write("🔍 正在萃取關鍵資訊...")
-                info = analyzer.extract_info(news_text)
-                
-                st.write("💡 正在生成投資建議...")
-                advice = analyzer.generate_advice(news_text, sentiment_label)
-                
-                status.update(label="✅ 分析完成！", state="complete")
-                
-                # Store results in session state to persist across reruns if needed
-                st.session_state['results'] = {
-                    'text': news_text,
-                    'sentiment': (sentiment_label, sentiment_score),
-                    'info': info,
-                    'advice': advice
-                }
+with col_main_2:
+    url_input = st.text_input("", placeholder="Paste article URL here...", label_visibility="collapsed")
+    analyze_btn = st.button("Analyze Market Sentiment", type="primary")
 
-with col2:
-    st.subheader("📊 分析儀表板")
-    
-    if 'results' in st.session_state:
-        results = st.session_state['results']
-        sentiment_label, sentiment_score = results['sentiment']
+st.markdown("---")
+
+if analyze_btn and url_input:
+    # Analysis Logic
+    with st.status("Processing Intelligence...", expanded=True) as status:
+        st.write("🌐 Fetching data stream...")
+        news_text = analyzer.fetch_news_from_url(url_input)
         
-        # 1. Sentiment Gauge
-        st.markdown("#### 情緒傾向")
-        
-        color = "lightgray"
-        if sentiment_label == "positive":
-            color = "#2ecc71" # Green
-        elif sentiment_label == "negative":
-            color = "#e74c3c" # Red
+        if news_text.startswith("Error"):
+            status.update(label="Connection Failed", state="error")
+            st.error(news_text)
         else:
-            color = "#f1c40f" # Yellow
+            st.write("🧠 Neural processing active...")
+            sentiment_label, sentiment_score = analyzer.analyze_sentiment(news_text)
+            
+            st.write("🔍 Extracting entities...")
+            info = analyzer.extract_info(news_text)
+            
+            st.write("💡 Synthesizing strategy...")
+            advice = analyzer.generate_advice(news_text, sentiment_label)
+            
+            status.update(label="Analysis Complete", state="complete")
+            
+            st.session_state['results'] = {
+                'text': news_text,
+                'sentiment': (sentiment_label, sentiment_score),
+                'info': info,
+                'advice': advice
+            }
+
+# Results Dashboard
+if 'results' in st.session_state:
+    results = st.session_state['results']
+    sentiment_label, sentiment_score = results['sentiment']
+    info = results['info']
+    
+    # Bento Grid Layout
+    col1, col2 = st.columns([1.5, 1])
+    
+    with col1:
+        # Sentiment Card
+        st.markdown('<div class="info-card">', unsafe_allow_html=True)
+        st.markdown('<div class="info-label">Market Sentiment</div>', unsafe_allow_html=True)
+        
+        color = "#94a3b8"
+        if sentiment_label == "positive":
+            color = "#4ade80" # Green
+        elif sentiment_label == "negative":
+            color = "#f87171" # Red
+        else:
+            color = "#facc15" # Yellow
             
         fig = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = sentiment_score * 100,
-            title = {'text': sentiment_label.upper(), 'font': {'color': 'white'}},
+            title = {'text': sentiment_label.upper(), 'font': {'color': color, 'size': 24, 'family': "Plus Jakarta Sans"}},
             gauge = {
-                'axis': {'range': [0, 100], 'tickcolor': "white"},
+                'axis': {'range': [0, 100], 'tickcolor': "#94a3b8", 'tickwidth': 1},
                 'bar': {'color': color},
                 'bgcolor': "rgba(0,0,0,0)",
-                'borderwidth': 2,
-                'bordercolor': "white",
+                'borderwidth': 0,
                 'steps': [
-                    {'range': [0, 100], 'color': "rgba(255, 255, 255, 0.1)"}
+                    {'range': [0, 100], 'color': "rgba(255, 255, 255, 0.05)"}
                 ],
             },
-            number = {'font': {'color': 'white'}}
+            number = {'font': {'color': '#f8fafc', 'size': 40, 'family': "Plus Jakarta Sans"}}
         ))
         fig.update_layout(
-            height=250, 
-            margin=dict(l=20, r=20, t=50, b=20),
+            height=280, 
+            margin=dict(l=20, r=20, t=40, b=20),
             paper_bgcolor='rgba(0,0,0,0)',
-            font={'color': "white"}
+            font={'color': "#94a3b8", 'family': "Plus Jakarta Sans"}
         )
         st.plotly_chart(fig, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
-        # 2. Key Info
-        st.markdown("#### 關鍵資訊")
-        info = results['info']
-        if "error" in info:
-            st.warning(f"資訊萃取受限: {info['error']}")
-        else:
-            c1, c2 = st.columns(2)
-            with c1:
-                st.markdown(f"""
-                <div class="info-card">
-                    <strong>🏢 公司</strong><br>{', '.join(info.get('company_name', []))}
-                </div>
-                <div class="info-card">
-                    <strong>🎫 代號</strong><br>{', '.join(info.get('stock_code', []))}
-                </div>
-                """, unsafe_allow_html=True)
-            with c2:
-                st.markdown(f"""
-                <div class="info-card">
-                    <strong>📅 時間</strong><br>{info.get('time_info', 'N/A')}
-                </div>
-                """, unsafe_allow_html=True)
+        # Investment Advice Card
+        st.markdown('<div class="info-card">', unsafe_allow_html=True)
+        st.markdown('<div class="info-label">Strategic Insight</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="info-value" style="font-size: 1rem;">{results["advice"]}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col2:
+        # Key Info Cards (Stacked)
+        st.markdown(f"""
+        <div class="info-card">
+            <div class="info-label">Target Entity</div>
+            <div class="info-value">{', '.join(info.get('company_name', ['N/A']))}</div>
+            <div style="margin-top: 8px; font-size: 0.9rem; color: #64748b;">{', '.join(info.get('stock_code', ['N/A']))}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown(f"""
+        <div class="info-card">
+            <div class="info-label">Timeline</div>
+            <div class="info-value">{info.get('time_info', 'N/A')}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        with st.expander("Raw Financial Data"):
+            st.json(info.get('financial_data', {}))
             
-            with st.expander("查看財務數據與事件"):
-                st.json(info.get('financial_data', {}))
-                st.write("**重大事件**:")
-                for event in info.get('events', []):
-                    st.write(f"- {event}")
+        with st.expander("Key Events"):
+            for event in info.get('events', []):
+                st.write(f"• {event}")
+                
+        with st.expander("Source Text"):
+            st.text(results['text'][:1000] + "...")
 
-        # 3. Advice
-        st.markdown("#### 💡 投資建議")
-        st.markdown(results['advice'])
-        
-        with st.expander("查看原始新聞內容"):
-            st.text(results['text'])
-
-    else:
-        st.info("👈 請在左側輸入網址並開始分析")
-        st.image("https://images.unsplash.com/photo-1611974765270-ca1258634369?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80", caption="Financial Analysis")
+else:
+    # Empty State
+    st.markdown("""
+    <div style="text-align: center; padding: 60px 20px; color: #64748b;">
+        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">⚡</div>
+        <p>Awaiting data stream for analysis...</p>
+    </div>
+    """, unsafe_allow_html=True)
 
