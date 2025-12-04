@@ -192,20 +192,7 @@ st.title("財經新聞智能分析系統")
 st.markdown('<p style="color: #94a3b8; font-size: 1.2rem; margin-top: -10px;">新世代 AI 市場洞察</p>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Market Overview Ticker
-if "market_data" not in st.session_state:
-    st.session_state["market_data"] = analyzer.fetch_market_data()
 
-market_data = st.session_state["market_data"]
-if market_data:
-    cols = st.columns(len(market_data))
-    for i, (name, data) in enumerate(market_data.items()):
-        cols[i].metric(
-            label=name, 
-            value=f"{data['price']:,.2f}", 
-            delta=f"{data['change_percent']:.2f}%"
-        )
-st.markdown("---")
 
 # Sidebar for Settings
 with st.sidebar:
@@ -237,6 +224,21 @@ def get_analyzer_v3(api_key_input):
     return FinancialAnalyzer(api_key=api_key)
 
 analyzer = get_analyzer_v3(user_api_key)
+
+# Market Overview Ticker
+if "market_data" not in st.session_state:
+    st.session_state["market_data"] = analyzer.fetch_market_data()
+
+market_data = st.session_state["market_data"]
+if market_data:
+    cols = st.columns(len(market_data))
+    for i, (name, data) in enumerate(market_data.items()):
+        cols[i].metric(
+            label=name, 
+            value=f"{data['price']:,.2f}", 
+            delta=f"{data['change_percent']:.2f}%"
+        )
+st.markdown("---")
 
 # Main Layout - Centered Search
 col_main_1, col_main_2, col_main_3 = st.columns([1, 2, 1])
