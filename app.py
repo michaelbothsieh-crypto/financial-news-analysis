@@ -16,173 +16,119 @@ st.markdown("""
 
     /* Global Reset & Typography */
     html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: #e2e8f0;
     }
     
     /* Background & Main Container */
     .stApp {
-        background-color: #020617;
-        background-image: 
-            radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
-            linear-gradient(#0f172a 1px, transparent 1px),
-            linear-gradient(90deg, #0f172a 1px, transparent 1px);
-        background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
-        color: #f8fafc;
+        background-color: #0f172a; /* Slate 900 */
+        background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 70%);
     }
 
     /* Headings */
     h1, h2, h3 {
         color: #f8fafc !important;
-        letter-spacing: -0.02em;
+        font-weight: 600 !important;
+        letter-spacing: -0.01em;
     }
     
     h1 {
-        font-weight: 800 !important;
-        background: linear-gradient(to right, #f8fafc, #94a3b8);
+        font-size: 2.2rem !important;
+        background: linear-gradient(to right, #f8fafc, #cbd5e1);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    /* Bento Grid Cards */
-    .css-1r6slb0, .stExpander, .info-card {
-        background: rgba(15, 23, 42, 0.6);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(148, 163, 184, 0.08);
-        border-radius: 24px;
-        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.2);
-        transition: transform 0.2s ease, border-color 0.2s ease;
+    /* Cards (Bento Grid / News) */
+    .info-card, .news-card {
+        background-color: #1e293b; /* Slate 800 */
+        border: 1px solid #334155; /* Slate 700 */
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.2s ease;
     }
     
-    .info-card:hover {
-        border-color: rgba(139, 92, 246, 0.3);
+    .news-card:hover {
+        border-color: #64748b; /* Slate 500 */
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     /* Primary Button */
     .stButton>button {
         width: 100%;
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        background-color: #3b82f6; /* Blue 500 */
         color: white;
-        font-weight: 600;
-        border-radius: 16px;
-        height: 56px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+        border-radius: 8px;
+        height: 48px;
+        border: none;
+        transition: background-color 0.2s;
     }
     
     .stButton>button:hover {
-        transform: translateY(-2px) scale(1.01);
-        box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.5);
-        border-color: rgba(255, 255, 255, 0.3);
+        background-color: #2563eb; /* Blue 600 */
+        border: none;
+    }
+    
+    .stButton>button:disabled {
+        background-color: #334155;
+        color: #94a3b8;
     }
 
     /* Input Fields */
-    /* Input Fields - Force High Contrast */
     .stTextInput>div>div>input {
-        background-color: #1e293b !important; /* Darker background */
-        color: #ffffff !important; /* Pure white text */
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        border-radius: 12px !important;
-        padding: 12px 16px !important;
-        font-size: 16px !important;
-        caret-color: #ffffff !important; /* White cursor */
+        background-color: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #334155 !important;
+        border-radius: 8px !important;
     }
     
     .stTextInput>div>div>input:focus {
-        border-color: #8b5cf6 !important;
-        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3) !important;
-        background-color: #1e293b !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 1px #3b82f6 !important;
     }
 
-    /* Force Sidebar to be Dark */
+    /* Sidebar */
     [data-testid="stSidebar"] {
-        background-color: #0f172a !important;
-        border-right: 1px solid rgba(148, 163, 184, 0.1);
+        background-color: #020617 !important; /* Slate 950 */
+        border-right: 1px solid #1e293b;
     }
     
-    /* Sidebar Text */
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] label, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p {
+    /* Metrics */
+    [data-testid="stMetricValue"] {
+        font-size: 1.5rem !important;
         color: #f8fafc !important;
     }
+    
+    [data-testid="stMetricLabel"] {
+        color: #94a3b8 !important;
+    }
 
-    /* Remove Top Padding & Hide Header Decoration */
     /* Adjust Top Padding for Streamlit Cloud Toolbar */
     .block-container {
-        padding-top: 3rem !important; /* Give space for the toolbar */
-        padding-bottom: 1rem !important;
-        margin-top: 0 !important;
+        padding-top: 3rem !important;
+        padding-bottom: 2rem !important;
     }
     
-    header[data-testid="stHeader"] {
-        /* background-color: rgba(0,0,0,0) !important; */
-        /* z-index: -1; */
-    }
-    
-    /* Remove H1 top margin */
-    h1 {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-    }
-    
-    /* Status Widget Styling - Safe Version */
-    div[data-testid="stStatusWidget"] {
-        background-color: #0f172a !important;
-        border: 1px solid rgba(148, 163, 184, 0.1) !important;
-    }
-    
-    /* Target text inside status widget */
-    div[data-testid="stStatusWidget"] > div,
-    div[data-testid="stStatusWidget"] p,
-    div[data-testid="stStatusWidget"] span {
-        color: #f8fafc !important;
-    }
-    
-    /* Ensure icons are visible */
-    div[data-testid="stStatusWidget"] svg {
-        fill: #f8fafc !important;
-    }
-    
-    /* Info Card Specifics */
-    .info-card {
-        padding: 24px;
-        margin-bottom: 16px;
-        height: 100%;
-    }
-    
-    .info-label {
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #94a3b8;
-        margin-bottom: 8px;
-        font-weight: 600;
-    }
-    
-    .info-value {
-        font-size: 1.1rem;
-        font-weight: 500;
-        color: #f1f5f9;
-        line-height: 1.4;
-    }
-
     /* Scrollbar */
     ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
     }
     ::-webkit-scrollbar-track {
-        background: transparent; 
+        background: #0f172a; 
     }
     ::-webkit-scrollbar-thumb {
-        background: rgba(148, 163, 184, 0.2); 
-        border-radius: 3px;
+        background: #334155; 
+        border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(148, 163, 184, 0.4); 
+        background: #475569; 
     }
+</style>
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -266,6 +212,11 @@ with col_main_2:
     )
 
 st.markdown("---")
+
+# Auto-trigger analysis if requested
+if st.session_state.get('trigger_analysis', False):
+    st.session_state['trigger_analysis'] = False # Reset flag
+    analyze_btn = True # Force trigger
 
 if analyze_btn:
     if not url_input:
@@ -409,26 +360,30 @@ else:
         # Get current batch
         current_batch = news_pool[offset : offset + batch_size]
         
-        # Display current batch
+        # Display current batch in a Grid
+        cols = st.columns(3)
         for i, item in enumerate(current_batch):
-            with st.container():
+            with cols[i]:
+                # News Card
                 st.markdown(f"""
-                <div style="background-color: rgba(15, 23, 42, 0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.1); margin-bottom: 12px;">
-                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 8px;">
+                <div class="news-card" style="height: 200px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div style="font-weight: 600; font-size: 1rem; margin-bottom: 12px; line-height: 1.4;">
                         <a href="{item['link']}" target="_blank" style="color: #f8fafc; text-decoration: none;">{item['title']}</a>
                     </div>
-                    <div style="font-size: 0.85rem; color: #94a3b8;">{item['published']}</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: auto;">{item['published']}</div>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Use a unique key based on the item's link or title hash to avoid conflicts during rotation
+                # Action Button
                 btn_key = f"trend_btn_{hash(item['title'])}"
-                if st.button("⚡ 立即分析", key=btn_key):
+                if st.button("⚡ 分析", key=btn_key, use_container_width=True):
                     st.session_state['url_input'] = item['link']
+                    st.session_state['trigger_analysis'] = True
                     st.rerun()
         
         # Refresh / Next Page Button
-        if st.button("🔄 換一批", type="secondary", use_container_width=True):
+        st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+        if st.button("🔄 換一批熱門新聞", type="secondary", use_container_width=True):
             # Increment offset, loop back if end reached
             new_offset = offset + batch_size
             if new_offset >= len(news_pool):
