@@ -46,9 +46,18 @@ class FinancialAnalyzer:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
             }
-            # Disable SSL verification to handle sites with poor cert chains
-            response = requests.get(url, headers=headers, timeout=10, verify=False)
+            
+            print(f"DEBUG: Fetching {url} with verify=False")
+            
+            # Use a session to ensure settings are applied
+            session = requests.Session()
+            session.verify = False
+            session.headers.update(headers)
+            
+            response = session.get(url, timeout=10)
             response.raise_for_status()
+            
+            print(f"DEBUG: Fetch success, status: {response.status_code}")
             
             soup = BeautifulSoup(response.text, 'html.parser')
             
