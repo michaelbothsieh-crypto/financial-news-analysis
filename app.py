@@ -138,6 +138,17 @@ st.title("財經新聞智能分析系統")
 st.markdown('<p style="color: #94a3b8; font-size: 1.2rem; margin-top: -10px;">新世代 AI 市場洞察</p>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
+# Helper function to set URL and trigger analysis
+def set_url_and_analyze(url):
+    st.session_state['main_url_input'] = url
+    st.session_state['trigger_analysis'] = True
+
+# Helper function to clear results
+def clear_results():
+    if 'results' in st.session_state:
+        del st.session_state['results']
+    st.session_state['main_url_input'] = ""
+
 
 
 # Sidebar for Settings
@@ -155,10 +166,9 @@ with st.sidebar:
         st.session_state['history'] = []
     
     # Display history in reverse order (newest first)
+    # Display history in reverse order (newest first)
     for i, url in enumerate(reversed(st.session_state['history'])):
-        if st.button(f"🔗 {url[:30]}...", key=f"hist_{i}", help=url):
-            st.session_state['main_url_input'] = url
-            st.rerun()
+        st.button(f"🔗 {url[:30]}...", key=f"hist_{i}", help=url, on_click=set_url_and_analyze, args=(url,))
 
 # Initialize Analyzer
 @st.cache_resource
@@ -258,10 +268,7 @@ if analyze_btn:
 # Results Dashboard
 if 'results' in st.session_state:
     # Back Button
-    if st.button("⬅️ 返回首頁 (繼續瀏覽熱門新聞)", type="secondary"):
-        del st.session_state['results']
-        st.session_state['main_url_input'] = ""
-        st.rerun()
+    st.button("⬅️ 返回首頁 (繼續瀏覽熱門新聞)", type="secondary", on_click=clear_results)
         
     results = st.session_state['results']
     sentiment_label, sentiment_score = results['sentiment']
@@ -377,10 +384,7 @@ else:
                 
                 # Action Button
                 btn_key = f"trend_btn_{hash(item['title'])}"
-                if st.button("⚡ 分析", key=btn_key, use_container_width=True, disabled=not has_api_key):
-                    st.session_state['main_url_input'] = item['link']
-                    st.session_state['trigger_analysis'] = True
-                    st.rerun()
+                st.button("⚡ 分析", key=btn_key, use_container_width=True, disabled=not has_api_key, on_click=set_url_and_analyze, args=(item['link'],))
         
         # Refresh / Next Page Button
         st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
