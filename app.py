@@ -234,7 +234,19 @@ with col_main_2:
         del st.session_state['url_input']
         
     url_input = st.text_input("", value=default_url, placeholder="請在此貼上新聞連結...", label_visibility="collapsed")
-    analyze_btn = st.button("分析市場情緒", type="primary")
+    
+    # Check if API Key is available
+    has_api_key = bool(user_api_key or os.getenv("OPENAI_API_KEY"))
+    
+    if not has_api_key:
+        st.warning("⚠️ 請先在左側設定欄輸入 OpenAI API Key 才能開始分析")
+        
+    analyze_btn = st.button(
+        "分析市場情緒", 
+        type="primary", 
+        disabled=not has_api_key,
+        help="請先輸入 API Key" if not has_api_key else "點擊開始分析"
+    )
 
 st.markdown("---")
 
