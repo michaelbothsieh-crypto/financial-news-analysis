@@ -3,9 +3,11 @@ import pandas as pd
 import openai
 import json
 import os
-import requests
-from bs4 import BeautifulSoup
 import feedparser
+from bs4 import BeautifulSoup
+import time
+import requests
+from googlenewsdecoder import new_decoderv1
 import yfinance as yf
 
 class FinancialAnalyzer:
@@ -20,9 +22,23 @@ class FinancialAnalyzer:
 
     def fetch_news_from_url(self, url):
         """
-        Fetch text content from a URL.
+        Fetches news content from a given URL.
+        Handles Google News redirects.
         """
         try:
+            # Handle Google News Redirects
+            if "news.google.com" in url:
+                print(f"DEBUG: Decoding Google News URL: {url}")
+                try:
+                    decoded = new_decoderv1(url)
+                    if decoded.get("status"):
+                        url = decoded.get("decoded_url")
+                        print(f"DEBUG: Decoded URL: {url}")
+                    else:
+                        print("DEBUG: Failed to decode Google News URL")
+                except Exception as e:
+                    print(f"DEBUG: Error decoding Google News URL: {e}")
+
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
