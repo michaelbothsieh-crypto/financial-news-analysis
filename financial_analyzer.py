@@ -174,7 +174,7 @@ class FinancialAnalyzer:
         Fetch trending financial news from Google News RSS.
         Returns: List of dicts {title, link, published}
         """
-        rss_url = "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWvfSkwyX3M0Z0pLUW5PaU1HaHVhM1Y1Z0FQAQ?hl=zh-TW&gl=TW&ceid=TW%3Azh-Hant"
+        rss_url = "https://news.google.com/rss/search?q=finance+when:1d&hl=zh-TW&gl=TW&ceid=TW:zh-Hant"
         try:
             feed = feedparser.parse(rss_url)
             news_items = []
