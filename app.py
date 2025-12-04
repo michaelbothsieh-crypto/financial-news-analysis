@@ -78,9 +78,9 @@ st.markdown("""
 
     /* Input Fields */
     .stTextInput>div>div>input {
-        background-color: rgba(15, 23, 42, 0.8);
+        background-color: rgba(255, 255, 255, 0.1); /* Lighter background */
         color: #f8fafc;
-        border: 1px solid rgba(148, 163, 184, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2); /* Higher contrast border */
         border-radius: 16px;
         padding: 12px 20px;
         font-size: 16px;
@@ -89,8 +89,8 @@ st.markdown("""
     
     .stTextInput>div>div>input:focus {
         border-color: #8b5cf6;
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-        background-color: rgba(15, 23, 42, 1);
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        background-color: rgba(255, 255, 255, 0.15);
     }
 
     /* Info Card Specifics */
@@ -136,8 +136,8 @@ st.markdown("""
 
 # Header Section
 st.markdown('<div style="margin-bottom: 40px; text-align: center;">', unsafe_allow_html=True)
-st.title("Financial Insights AI")
-st.markdown('<p style="color: #94a3b8; font-size: 1.2rem; margin-top: -10px;">Next-Gen Market Intelligence</p>', unsafe_allow_html=True)
+st.title("財經新聞智能分析系統")
+st.markdown('<p style="color: #94a3b8; font-size: 1.2rem; margin-top: -10px;">新世代 AI 市場洞察</p>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Initialize Analyzer
@@ -154,31 +154,31 @@ analyzer = get_analyzer_v3()
 col_main_1, col_main_2, col_main_3 = st.columns([1, 2, 1])
 
 with col_main_2:
-    url_input = st.text_input("", placeholder="Paste article URL here...", label_visibility="collapsed")
-    analyze_btn = st.button("Analyze Market Sentiment", type="primary")
+    url_input = st.text_input("", placeholder="請在此貼上新聞連結...", label_visibility="collapsed")
+    analyze_btn = st.button("分析市場情緒", type="primary")
 
 st.markdown("---")
 
 if analyze_btn and url_input:
     # Analysis Logic
-    with st.status("Processing Intelligence...", expanded=True) as status:
-        st.write("🌐 Fetching data stream...")
+    with st.status("正在進行智能分析...", expanded=True) as status:
+        st.write("🌐 正在抓取數據流...")
         news_text = analyzer.fetch_news_from_url(url_input)
         
         if news_text.startswith("Error"):
-            status.update(label="Connection Failed", state="error")
+            status.update(label="連線失敗", state="error")
             st.error(news_text)
         else:
-            st.write("🧠 Neural processing active...")
+            st.write("🧠 神經網絡處理中...")
             sentiment_label, sentiment_score = analyzer.analyze_sentiment(news_text)
             
-            st.write("🔍 Extracting entities...")
+            st.write("🔍 正在萃取關鍵實體...")
             info = analyzer.extract_info(news_text)
             
-            st.write("💡 Synthesizing strategy...")
+            st.write("💡 正在合成投資策略...")
             advice = analyzer.generate_advice(news_text, sentiment_label)
             
-            status.update(label="Analysis Complete", state="complete")
+            status.update(label="分析完成", state="complete")
             
             st.session_state['results'] = {
                 'text': news_text,
@@ -199,7 +199,7 @@ if 'results' in st.session_state:
     with col1:
         # Sentiment Card
         st.markdown('<div class="info-card">', unsafe_allow_html=True)
-        st.markdown('<div class="info-label">Market Sentiment</div>', unsafe_allow_html=True)
+        st.markdown('<div class="info-label">市場情緒</div>', unsafe_allow_html=True)
         
         color = "#94a3b8"
         if sentiment_label == "positive":
@@ -235,7 +235,7 @@ if 'results' in st.session_state:
         
         # Investment Advice Card
         st.markdown('<div class="info-card">', unsafe_allow_html=True)
-        st.markdown('<div class="info-label">Strategic Insight</div>', unsafe_allow_html=True)
+        st.markdown('<div class="info-label">策略洞察</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="info-value" style="font-size: 1rem;">{results["advice"]}</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -243,7 +243,7 @@ if 'results' in st.session_state:
         # Key Info Cards (Stacked)
         st.markdown(f"""
         <div class="info-card">
-            <div class="info-label">Target Entity</div>
+            <div class="info-label">目標實體</div>
             <div class="info-value">{', '.join(info.get('company_name', ['N/A']))}</div>
             <div style="margin-top: 8px; font-size: 0.9rem; color: #64748b;">{', '.join(info.get('stock_code', ['N/A']))}</div>
         </div>
@@ -251,19 +251,19 @@ if 'results' in st.session_state:
         
         st.markdown(f"""
         <div class="info-card">
-            <div class="info-label">Timeline</div>
+            <div class="info-label">時間軸</div>
             <div class="info-value">{info.get('time_info', 'N/A')}</div>
         </div>
         """, unsafe_allow_html=True)
         
-        with st.expander("Raw Financial Data"):
+        with st.expander("原始財務數據"):
             st.json(info.get('financial_data', {}))
             
-        with st.expander("Key Events"):
+        with st.expander("關鍵事件"):
             for event in info.get('events', []):
                 st.write(f"• {event}")
                 
-        with st.expander("Source Text"):
+        with st.expander("新聞來源"):
             st.text(results['text'][:1000] + "...")
 
 else:
@@ -271,7 +271,7 @@ else:
     st.markdown("""
     <div style="text-align: center; padding: 60px 20px; color: #64748b;">
         <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">⚡</div>
-        <p>Awaiting data stream for analysis...</p>
+        <p>等待數據流進行分析...</p>
     </div>
     """, unsafe_allow_html=True)
 
