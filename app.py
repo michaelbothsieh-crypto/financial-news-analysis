@@ -140,15 +140,22 @@ st.title("財經新聞智能分析系統")
 st.markdown('<p style="color: #94a3b8; font-size: 1.2rem; margin-top: -10px;">新世代 AI 市場洞察</p>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
+# Sidebar for Settings
+with st.sidebar:
+    st.header("⚙️ 設定")
+    user_api_key = st.text_input("OpenAI API Key", type="password", placeholder="sk-proj-...")
+    st.markdown("---")
+    st.markdown("### 關於")
+    st.markdown("此系統使用 FinBERT 進行情緒分析，並透過 OpenAI 進行深度解讀。")
+
 # Initialize Analyzer
 @st.cache_resource
-def get_analyzer_v3():
-    # API Key should be set in environment variables for security
-    # In local development, you can set it in .env or export it
-    api_key = os.getenv("OPENAI_API_KEY")
+def get_analyzer_v3(api_key_input):
+    # Priority: User Input > Environment Variable
+    api_key = api_key_input or os.getenv("OPENAI_API_KEY")
     return FinancialAnalyzer(api_key=api_key)
 
-analyzer = get_analyzer_v3()
+analyzer = get_analyzer_v3(user_api_key)
 
 # Main Layout - Centered Search
 col_main_1, col_main_2, col_main_3 = st.columns([1, 2, 1])
@@ -159,14 +166,6 @@ with col_main_2:
 
 st.markdown("---")
 
-if analyze_btn and url_input:
-    # Analysis Logic
-    with st.status("正在進行智能分析...", expanded=True) as status:
-        st.write("🌐 正在抓取數據流...")
-        news_text = analyzer.fetch_news_from_url(url_input)
-        
-        if news_text.startswith("Error"):
-            status.update(label="連線失敗", state="error")
             st.error(news_text)
         else:
             st.write("🧠 神經網絡處理中...")
