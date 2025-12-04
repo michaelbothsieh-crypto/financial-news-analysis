@@ -116,8 +116,8 @@ st.markdown("""
     }
     
     header[data-testid="stHeader"] {
-        background-color: rgba(0,0,0,0) !important;
-        z-index: -1;
+        /* background-color: rgba(0,0,0,0) !important; */
+        /* z-index: -1; */
     }
     
     /* Remove H1 top margin */
@@ -126,44 +126,22 @@ st.markdown("""
         padding-top: 0 !important;
     }
     
-    /* Nuclear Option for Status Widget */
+    /* Status Widget Styling - Safe Version */
     div[data-testid="stStatusWidget"] {
         background-color: #0f172a !important;
         border: 1px solid rgba(148, 163, 184, 0.1) !important;
     }
     
-    /* Target ALL children within the status widget */
-    div[data-testid="stStatusWidget"] * {
-        background-color: #0f172a !important;
+    /* Target text inside status widget */
+    div[data-testid="stStatusWidget"] > div,
+    div[data-testid="stStatusWidget"] p,
+    div[data-testid="stStatusWidget"] span {
         color: #f8fafc !important;
     }
     
-    /* Specifically target details and summary globally as a fallback */
-    details {
-        background-color: #0f172a !important;
-        border-color: rgba(148, 163, 184, 0.1) !important;
-    }
-    
-    summary {
-        background-color: #0f172a !important;
-        color: #f8fafc !important;
-    }
-    
-    summary:hover {
-        background-color: #1e293b !important;
-    }
-    
-    /* Fix SVG Icons in Status */
+    /* Ensure icons are visible */
     div[data-testid="stStatusWidget"] svg {
         fill: #f8fafc !important;
-        stroke: #f8fafc !important;
-        background-color: transparent !important; /* Icons shouldn't have background */
-    }
-    
-    /* Ensure the spinner is visible */
-    div[data-testid="stStatusWidget"] .stSpinner {
-        border-color: #8b5cf6 !important;
-        border-top-color: transparent !important;
     }
     
     /* Info Card Specifics */
