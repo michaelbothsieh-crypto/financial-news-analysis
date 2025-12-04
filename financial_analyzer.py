@@ -1,5 +1,5 @@
 import pandas as pd
-from transformers import pipeline
+# from transformers import pipeline
 import openai
 import json
 import os
@@ -49,24 +49,46 @@ class FinancialAnalyzer:
 
     def analyze_sentiment(self, text):
         """
-        Analyze sentiment using FinBERT.
-        Returns: label (Positive/Neutral/Negative), score
+        Analyze sentiment using OpenAI (lighter than FinBERT for deployment).
+        Returns: label (positive/neutral/negative), score (confidence)
         """
-        if not self.sentiment_pipeline:
-            try:
-                print("Loading FinBERT model...")
-                self.sentiment_pipeline = pipeline("text-classification", model="ProsusAI/finbert")
-            except Exception as e:
-                print(f"Error loading FinBERT: {e}")
-                return f"Error loading model: {str(e)}", 0.0
+        if not self.api_key:
+            return "neutral", 0.0
         
-        # FinBERT has a max token length, usually 512. We might need to truncate or chunk.
+        truncated_text = text[:4000]
+        
+        prompt = f"""
+        請分析以下財經新聞的情緒。
+        請只輸出 JSON 格式，包含兩個欄位：
+        - label: "positive", "neutral", 或 "negative"
+        - score: 0.0 到 1.0 之間的情緒強度分數
+
+        新聞內容：
+        {truncated_text}
+        """
+
         try:
-            # Truncate to 512 tokens (approx) to avoid errors
-            result = self.sentiment_pipeline(text[:2000], truncation=True, max_length=512)[0]
-            return result['label'], result['score']
+            client = openai.OpenAI(api_key=self.api_key)
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a financial sentiment analyst. Output valid JSON only."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0
+            )
+            content = response.choices[0].message.content
+            # Clean up code blocks
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0]
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0]
+                
+            result = json.loads(content.strip())
+            return result.get("label", "neutral"), result.get("score", 0.5)
         except Exception as e:
-            return f"Error: {str(e)}", 0.0
+            print(f"Error in sentiment analysis: {e}")
+            return "neutral", 0.0
 
     def extract_info(self, text):
         """

@@ -197,7 +197,7 @@ with st.sidebar:
     user_api_key = st.text_input("OpenAI API Key", type="password", placeholder="sk-proj-...")
     st.markdown("---")
     st.markdown("### 關於")
-    st.markdown("此系統使用 FinBERT 進行情緒分析，並透過 OpenAI 進行深度解讀。")
+    st.markdown("此系統使用 OpenAI GPT 模型進行全方位的情緒分析與深度解讀。")
     
     # History Section
     st.markdown("---")
