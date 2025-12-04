@@ -9,8 +9,8 @@ import time
 import requests
 from googlenewsdecoder import new_decoderv1
 import yfinance as yf
-
 import urllib3
+
 # Suppress SSL warnings for scraper
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
