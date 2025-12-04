@@ -7,7 +7,6 @@ import feedparser
 from bs4 import BeautifulSoup
 import time
 import requests
-from googlenewsdecoder import new_decoderv1
 import yfinance as yf
 import urllib3
 
@@ -27,27 +26,11 @@ class FinancialAnalyzer:
     def fetch_news_from_url(self, url):
         """
         Fetches news content from a given URL.
-        Handles Google News redirects.
         """
         try:
-            # Handle Google News Redirects
-            if "news.google.com" in url:
-                print(f"DEBUG: Decoding Google News URL: {url}")
-                try:
-                    decoded = new_decoderv1(url)
-                    if decoded.get("status"):
-                        url = decoded.get("decoded_url")
-                        print(f"DEBUG: Decoded URL: {url}")
-                    else:
-                        print("DEBUG: Failed to decode Google News URL")
-                except Exception as e:
-                    print(f"DEBUG: Error decoding Google News URL: {e}")
-
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
             }
-            
-            print(f"DEBUG: Fetching {url} with verify=False")
             
             # Use a session to ensure settings are applied
             session = requests.Session()
@@ -56,8 +39,6 @@ class FinancialAnalyzer:
             
             response = session.get(url, timeout=10)
             response.raise_for_status()
-            
-            print(f"DEBUG: Fetch success, status: {response.status_code}")
             
             soup = BeautifulSoup(response.text, 'html.parser')
             
@@ -201,10 +182,11 @@ class FinancialAnalyzer:
 
     def fetch_trending_news(self, limit=5):
         """
-        Fetch trending financial news from Google News RSS.
+        Fetch trending financial news from Yahoo Finance RSS.
         Returns: List of dicts {title, link, published}
         """
-        rss_url = "https://news.google.com/rss/search?q=finance+when:1d&hl=zh-TW&gl=TW&ceid=TW:zh-Hant"
+        # Yahoo Finance RSS
+        rss_url = "https://finance.yahoo.com/news/rssindex"
         try:
             feed = feedparser.parse(rss_url)
             news_items = []
