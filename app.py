@@ -5,7 +5,7 @@ import time
 import os
 
 st.set_page_config(page_title="Financial Insights AI", layout="wide", page_icon="⚡")
-print("🚀 Starting Financial Insights AI...")
+print("🚀 Starting Financial Insights AI - Version 14e4f38 (Fixing Deployment)")
 if not os:
     import os
 
@@ -236,6 +236,8 @@ with st.sidebar:
 # Initialize Analyzer
 @st.cache_resource
 def get_analyzer_v3(api_key_input):
+    import os # Defensive import
+    print("DEBUG: get_analyzer_v3 called with input:", api_key_input)
     # Priority: User Input > Environment Variable
     api_key = api_key_input or os.getenv("OPENAI_API_KEY")
     return FinancialAnalyzer(api_key=api_key)
