@@ -192,6 +192,21 @@ st.title("財經新聞智能分析系統")
 st.markdown('<p style="color: #94a3b8; font-size: 1.2rem; margin-top: -10px;">新世代 AI 市場洞察</p>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
+# Market Overview Ticker
+if "market_data" not in st.session_state:
+    st.session_state["market_data"] = analyzer.fetch_market_data()
+
+market_data = st.session_state["market_data"]
+if market_data:
+    cols = st.columns(len(market_data))
+    for i, (name, data) in enumerate(market_data.items()):
+        cols[i].metric(
+            label=name, 
+            value=f"{data['price']:,.2f}", 
+            delta=f"{data['change_percent']:.2f}%"
+        )
+st.markdown("---")
+
 # Sidebar for Settings
 with st.sidebar:
     st.header("⚙️ 設定")
@@ -374,10 +389,30 @@ if 'results' in st.session_state:
 
 else:
     # Empty State
-    st.markdown("""
-    <div style="text-align: center; padding: 60px 20px; color: #64748b;">
-        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">⚡</div>
-        <p>等待數據流進行分析...</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Trending News Section
+    st.markdown("### 🔥 全球熱門財經新聞")
+    
+    if "trending_news" not in st.session_state:
+        st.session_state["trending_news"] = analyzer.fetch_trending_news()
+        
+    trending_news = st.session_state["trending_news"]
+    
+    if trending_news:
+        for i, item in enumerate(trending_news):
+            with st.container():
+                # Card styling for news item
+                st.markdown(f"""
+                <div style="background-color: rgba(15, 23, 42, 0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.1); margin-bottom: 12px;">
+                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 8px;">
+                        <a href="{item['link']}" target="_blank" style="color: #f8fafc; text-decoration: none;">{item['title']}</a>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #94a3b8;">{item['published']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                if st.button("⚡ 立即分析", key=f"trend_{i}"):
+                    st.session_state['url_input'] = item['link']
+                    st.rerun()
+    else:
+        st.info("暫時無法取得熱門新聞")
 

@@ -5,6 +5,8 @@ import json
 import os
 import requests
 from bs4 import BeautifulSoup
+import feedparser
+import yfinance as yf
 
 class FinancialAnalyzer:
     def __init__(self, api_key=None, model_provider="openai"):
@@ -166,3 +168,53 @@ class FinancialAnalyzer:
             return response.choices[0].message.content
         except Exception as e:
             return f"Error generating advice: {str(e)}"
+
+    def fetch_trending_news(self, limit=5):
+        """
+        Fetch trending financial news from Google News RSS.
+        Returns: List of dicts {title, link, published}
+        """
+        rss_url = "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWvfSkwyX3M0Z0pLUW5PaU1HaHVhM1Y1Z0FQAQ?hl=zh-TW&gl=TW&ceid=TW%3Azh-Hant"
+        try:
+            feed = feedparser.parse(rss_url)
+            news_items = []
+            for entry in feed.entries[:limit]:
+                news_items.append({
+                    "title": entry.title,
+                    "link": entry.link,
+                    "published": entry.published
+                })
+            return news_items
+        except Exception as e:
+            print(f"Error fetching trending news: {e}")
+            return []
+
+    def fetch_market_data(self):
+        """
+        Fetch current market data for key indices.
+        Returns: Dict of {symbol: {price, change_percent}}
+        """
+        tickers = {
+            "^GSPC": "S&P 500",
+            "^IXIC": "Nasdaq",
+            "^TWII": "台灣加權",
+            "BTC-USD": "Bitcoin"
+        }
+        data = {}
+        try:
+            for symbol, name in tickers.items():
+                ticker = yf.Ticker(symbol)
+                # Get fast info first (faster than history)
+                info = ticker.fast_info
+                if info and info.last_price:
+                    price = info.last_price
+                    prev_close = info.previous_close
+                    change_percent = ((price - prev_close) / prev_close) * 100
+                    data[name] = {
+                        "price": price,
+                        "change_percent": change_percent
+                    }
+            return data
+        except Exception as e:
+            print(f"Error fetching market data: {e}")
+            return {}
