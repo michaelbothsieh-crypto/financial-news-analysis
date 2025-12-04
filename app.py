@@ -394,15 +394,24 @@ else:
     # Trending News Section
     st.markdown("### 🔥 全球熱門財經新聞")
     
-    if "trending_news" not in st.session_state:
-        st.session_state["trending_news"] = analyzer.fetch_trending_news()
-        
-    trending_news = st.session_state["trending_news"]
+    # Initialize news pool if not present
+    if "trending_news_pool" not in st.session_state:
+        with st.spinner("正在抓取最新頭條..."):
+            # Fetch more items to allow rotation (e.g., 20 items)
+            st.session_state["trending_news_pool"] = analyzer.fetch_trending_news(limit=20)
+            st.session_state["news_offset"] = 0
+            
+    news_pool = st.session_state["trending_news_pool"]
+    offset = st.session_state["news_offset"]
+    batch_size = 3
     
-    if trending_news:
-        for i, item in enumerate(trending_news):
+    if news_pool:
+        # Get current batch
+        current_batch = news_pool[offset : offset + batch_size]
+        
+        # Display current batch
+        for i, item in enumerate(current_batch):
             with st.container():
-                # Card styling for news item
                 st.markdown(f"""
                 <div style="background-color: rgba(15, 23, 42, 0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.1); margin-bottom: 12px;">
                     <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 8px;">
@@ -412,9 +421,21 @@ else:
                 </div>
                 """, unsafe_allow_html=True)
                 
-                if st.button("⚡ 立即分析", key=f"trend_{i}"):
+                # Use a unique key based on the item's link or title hash to avoid conflicts during rotation
+                btn_key = f"trend_btn_{hash(item['title'])}"
+                if st.button("⚡ 立即分析", key=btn_key):
                     st.session_state['url_input'] = item['link']
                     st.rerun()
+        
+        # Refresh / Next Page Button
+        if st.button("🔄 換一批", type="secondary", use_container_width=True):
+            # Increment offset, loop back if end reached
+            new_offset = offset + batch_size
+            if new_offset >= len(news_pool):
+                new_offset = 0
+            st.session_state["news_offset"] = new_offset
+            st.rerun()
+            
     else:
         st.info("暫時無法取得熱門新聞")
 
