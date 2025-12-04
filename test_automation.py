@@ -8,11 +8,8 @@ def test_automation():
     # 1. Initialize
     print("1. Initializing Analyzer...")
     analyzer = FinancialAnalyzer()
-    if analyzer.sentiment_pipeline:
-        print("   ✅ FinBERT loaded successfully")
-    else:
-        print("   ❌ FinBERT failed to load")
-        sys.exit(1)
+    print("   ✅ Analyzer instance created")
+    # Pipeline is lazy-loaded, so we will test it in step 3
 
     # 2. Test URL Fetching
     test_url = "https://finance.yahoo.com/news/nvidia-stock-falls-after-earnings-report-what-investors-need-to-know-123456.html" 

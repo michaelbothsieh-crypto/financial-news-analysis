@@ -13,11 +13,8 @@ class FinancialAnalyzer:
         self.model_provider = model_provider
         
         # Initialize FinBERT pipeline
-        try:
-            self.sentiment_pipeline = pipeline("text-classification", model="ProsusAI/finbert")
-        except Exception as e:
-            print(f"Error loading FinBERT: {e}")
-            self.sentiment_pipeline = None
+        # Lazy loading: Don't load it here to save memory on startup
+        self.sentiment_pipeline = None
 
     def fetch_news_from_url(self, url):
         """
@@ -56,7 +53,12 @@ class FinancialAnalyzer:
         Returns: label (Positive/Neutral/Negative), score
         """
         if not self.sentiment_pipeline:
-            return "Error", 0.0
+            try:
+                print("Loading FinBERT model...")
+                self.sentiment_pipeline = pipeline("text-classification", model="ProsusAI/finbert")
+            except Exception as e:
+                print(f"Error loading FinBERT: {e}")
+                return f"Error loading model: {str(e)}", 0.0
         
         # FinBERT has a max token length, usually 512. We might need to truncate or chunk.
         try:
@@ -78,7 +80,7 @@ class FinancialAnalyzer:
         truncated_text = text[:4000]
 
         prompt = f"""
-        請分析以下財經新聞，並提取關鍵資訊。請以 JSON 格式輸出，包含以下欄位：
+        請分析以下財經新聞，並提取關鍵資訊。請務必使用**繁體中文**回答。請以 JSON 格式輸出，包含以下欄位：
         - company_name: 公司名稱 (List of strings)
         - stock_code: 股票代號 (List of strings)
         - financial_data: 財務數據 (Dictionary, e.g., {{"revenue": "...", "eps": "..."}})
@@ -120,7 +122,7 @@ class FinancialAnalyzer:
         truncated_text = text[:4000]
 
         prompt = f"""
-        基於以下財經新聞內容以及情緒分析結果（{sentiment_label}），請給出結構化的投資建議。
+        基於以下財經新聞內容以及情緒分析結果（{sentiment_label}），請給出結構化的投資建議。請務必使用**繁體中文**回答。
         建議應包含：
         1. 短期觀察重點
         2. 長期投資潛力

@@ -77,22 +77,92 @@ st.markdown("""
     }
 
     /* Input Fields */
+    /* Input Fields - Force High Contrast */
     .stTextInput>div>div>input {
-        background-color: rgba(255, 255, 255, 0.1); /* Lighter background */
-        color: #f8fafc;
-        border: 1px solid rgba(255, 255, 255, 0.2); /* Higher contrast border */
-        border-radius: 16px;
-        padding: 12px 20px;
-        font-size: 16px;
-        transition: all 0.2s ease;
+        background-color: #1e293b !important; /* Darker background */
+        color: #ffffff !important; /* Pure white text */
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 12px !important;
+        padding: 12px 16px !important;
+        font-size: 16px !important;
+        caret-color: #ffffff !important; /* White cursor */
     }
     
     .stTextInput>div>div>input:focus {
-        border-color: #8b5cf6;
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
-        background-color: rgba(255, 255, 255, 0.15);
+        border-color: #8b5cf6 !important;
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3) !important;
+        background-color: #1e293b !important;
     }
 
+    /* Force Sidebar to be Dark */
+    [data-testid="stSidebar"] {
+        background-color: #0f172a !important;
+        border-right: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    
+    /* Sidebar Text */
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] label, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p {
+        color: #f8fafc !important;
+    }
+
+    /* Remove Top Padding & Hide Header Decoration */
+    .block-container {
+        padding-top: 0rem !important;
+        padding-bottom: 1rem !important;
+        margin-top: -20px !important;
+    }
+    
+    header[data-testid="stHeader"] {
+        background-color: rgba(0,0,0,0) !important;
+        z-index: -1;
+    }
+    
+    /* Remove H1 top margin */
+    h1 {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Nuclear Option for Status Widget */
+    div[data-testid="stStatusWidget"] {
+        background-color: #0f172a !important;
+        border: 1px solid rgba(148, 163, 184, 0.1) !important;
+    }
+    
+    /* Target ALL children within the status widget */
+    div[data-testid="stStatusWidget"] * {
+        background-color: #0f172a !important;
+        color: #f8fafc !important;
+    }
+    
+    /* Specifically target details and summary globally as a fallback */
+    details {
+        background-color: #0f172a !important;
+        border-color: rgba(148, 163, 184, 0.1) !important;
+    }
+    
+    summary {
+        background-color: #0f172a !important;
+        color: #f8fafc !important;
+    }
+    
+    summary:hover {
+        background-color: #1e293b !important;
+    }
+    
+    /* Fix SVG Icons in Status */
+    div[data-testid="stStatusWidget"] svg {
+        fill: #f8fafc !important;
+        stroke: #f8fafc !important;
+        background-color: transparent !important; /* Icons shouldn't have background */
+    }
+    
+    /* Ensure the spinner is visible */
+    div[data-testid="stStatusWidget"] .stSpinner {
+        border-color: #8b5cf6 !important;
+        border-top-color: transparent !important;
+    }
+    
     /* Info Card Specifics */
     .info-card {
         padding: 24px;
@@ -135,7 +205,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Header Section
-st.markdown('<div style="margin-bottom: 40px; text-align: center;">', unsafe_allow_html=True)
+st.markdown('<div style="margin-bottom: 20px; text-align: center;">', unsafe_allow_html=True)
 st.title("財經新聞智能分析系統")
 st.markdown('<p style="color: #94a3b8; font-size: 1.2rem; margin-top: -10px;">新世代 AI 市場洞察</p>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
@@ -147,6 +217,18 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 關於")
     st.markdown("此系統使用 FinBERT 進行情緒分析，並透過 OpenAI 進行深度解讀。")
+    
+    # History Section
+    st.markdown("---")
+    st.header("📜 歷史記錄")
+    if 'history' not in st.session_state:
+        st.session_state['history'] = []
+    
+    # Display history in reverse order (newest first)
+    for i, url in enumerate(reversed(st.session_state['history'])):
+        if st.button(f"🔗 {url[:30]}...", key=f"hist_{i}", help=url):
+            st.session_state['url_input'] = url
+            st.rerun()
 
 # Initialize Analyzer
 @st.cache_resource
@@ -161,30 +243,58 @@ analyzer = get_analyzer_v3(user_api_key)
 col_main_1, col_main_2, col_main_3 = st.columns([1, 2, 1])
 
 with col_main_2:
-    url_input = st.text_input("", placeholder="請在此貼上新聞連結...", label_visibility="collapsed")
+    # Check if we have a URL from history click
+    default_url = st.session_state.get('url_input', "")
+    # Clear the session state trigger to avoid stuck input
+    if 'url_input' in st.session_state:
+        del st.session_state['url_input']
+        
+    url_input = st.text_input("", value=default_url, placeholder="請在此貼上新聞連結...", label_visibility="collapsed")
     analyze_btn = st.button("分析市場情緒", type="primary")
 
 st.markdown("---")
 
-            st.error(news_text)
-        else:
-            st.write("🧠 神經網絡處理中...")
-            sentiment_label, sentiment_score = analyzer.analyze_sentiment(news_text)
+if analyze_btn:
+    if not url_input:
+        st.warning("請輸入新聞連結")
+    else:
+        with st.status("正在分析...", expanded=True) as status:
+            st.write("🌐 正在讀取新聞內容...")
+            news_text = analyzer.fetch_news_from_url(url_input)
             
-            st.write("🔍 正在萃取關鍵實體...")
-            info = analyzer.extract_info(news_text)
-            
-            st.write("💡 正在合成投資策略...")
-            advice = analyzer.generate_advice(news_text, sentiment_label)
-            
-            status.update(label="分析完成", state="complete")
-            
-            st.session_state['results'] = {
-                'text': news_text,
-                'sentiment': (sentiment_label, sentiment_score),
-                'info': info,
-                'advice': advice
-            }
+            if news_text.startswith("Error"):
+                st.error(news_text)
+                status.update(label="分析失敗", state="error")
+            else:
+                st.write("🧠 神經網絡處理中...")
+                sentiment_label, sentiment_score = analyzer.analyze_sentiment(news_text)
+                
+                # Translate Sentiment Label
+                sentiment_map = {
+                    "positive": "正面",
+                    "negative": "負面",
+                    "neutral": "中立"
+                }
+                sentiment_label_zh = sentiment_map.get(sentiment_label, sentiment_label)
+                
+                st.write("🔍 正在萃取關鍵實體...")
+                info = analyzer.extract_info(news_text)
+                
+                st.write("💡 正在合成投資策略...")
+                advice = analyzer.generate_advice(news_text, sentiment_label_zh)
+                
+                status.update(label="分析完成", state="complete")
+                
+                st.session_state['results'] = {
+                    'text': news_text,
+                    'sentiment': (sentiment_label_zh, sentiment_score),
+                    'info': info,
+                    'advice': advice
+                }
+                
+                # Add to history if not exists
+                if url_input not in st.session_state['history']:
+                    st.session_state['history'].append(url_input)
 
 # Results Dashboard
 if 'results' in st.session_state:
@@ -201,9 +311,10 @@ if 'results' in st.session_state:
         st.markdown('<div class="info-label">市場情緒</div>', unsafe_allow_html=True)
         
         color = "#94a3b8"
-        if sentiment_label == "positive":
+        color = "#94a3b8"
+        if sentiment_label == "正面":
             color = "#4ade80" # Green
-        elif sentiment_label == "negative":
+        elif sentiment_label == "負面":
             color = "#f87171" # Red
         else:
             color = "#facc15" # Yellow

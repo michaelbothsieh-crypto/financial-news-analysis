@@ -1,64 +1,54 @@
-# 財經新聞智能分析系統 (Financial News AI Analyzer)
+# 財經新聞智能分析系統 (Financial Insights AI)
 
-這是一個基於 Streamlit 和 OpenAI 的財經新聞智能分析系統。它能夠自動抓取新聞內容，進行情緒分析，提取關鍵資訊，並生成投資建議。
+這是一個基於 Streamlit 的 AI 驅動財經新聞分析工具。它利用 **FinBERT** 進行專業的情緒分析，並結合 **OpenAI GPT** 模型來提取關鍵資訊並生成投資建議。
 
 ## 功能特色
 
--   **自動抓取**: 輸入新聞網址即可自動提取內容。
--   **情緒分析**: 使用 FinBERT 模型分析新聞情緒（正面/負面/中性）。
--   **關鍵資訊萃取**: 使用 LLM 提取公司名稱、股票代號、財務數據等。
--   **投資建議**: 根據分析結果生成結構化的投資建議。
--   **現代化 UI**: 採用精緻的 Dark Mode 設計，提供最佳的使用者體驗。
+- **情緒分析**: 使用 `ProsusAI/finbert` 模型準確判斷新聞情緒（正面、負面、中立）。
+- **關鍵資訊提取**: 自動從新聞中提取公司名稱、股票代號、財務數據和重大事件。
+- **投資策略建議**: 根據新聞內容與情緒分數，生成結構化的短期與長期投資建議。
+- **現代化 UI**: 採用深色主題、玻璃擬態（Glassmorphism）設計，提供專業且舒適的視覺體驗。
+- **歷史記錄**: 自動儲存分析過的連結，方便隨時回顧。
 
-## 本地安裝與執行
+## 安裝與執行
 
-1.  **Clone 專案**
-    ```bash
-    git clone <your-repo-url>
-    cd financial_news_analysis
-    ```
+### 1. 環境設定
 
-2.  **建立虛擬環境**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # Windows: venv\Scripts\activate
-    ```
+確保您已安裝 Python 3.9+。
 
-3.  **安裝依賴**
-    ```bash
-    pip install -r requirements.txt
-    ```
+```bash
+# 建立虛擬環境
+python3 -m venv venv
+source venv/bin/activate
 
-4.  **設定環境變數**
-    專案需要 OpenAI API Key。雖然程式碼中已包含（僅供演示），建議使用環境變數：
-    ```bash
-    export OPENAI_API_KEY='your-api-key'
-    ```
+# 安裝依賴套件
+pip install -r requirements.txt
+```
 
-5.  **執行應用程式**
-    ```bash
-    streamlit run app.py
-    ```
+### 2. 設定 API Key
 
-## 部署至 Render
+您需要一組 OpenAI API Key 才能使用進階分析功能。
+您可以將其設定為環境變數，或是在應用程式介面中輸入。
 
-本專案已準備好部署至 [Render](https://render.com)。
+```bash
+export OPENAI_API_KEY="your-api-key-here"
+```
 
-1.  將程式碼推送到 GitHub。
-2.  在 Render Dashboard 點擊 "New +" -> "Web Service"。
-3.  連結你的 GitHub Repository。
-4.  **設定如下 (手動輸入)**：
-    -   **Name**: `financial-news-analysis` (或您喜歡的名字)
-    -   **Runtime**: `Python 3`
-    -   **Build Command**: `pip install -r requirements.txt`
-    -   **Start Command**: `streamlit run app.py --server.port $PORT --server.address 0.0.0.0`
-5.  點擊 "Create Web Service"。
+### 3. 啟動應用程式
 
-> **注意**: 如果您是使用 "New > Blueprint" 匯入，Render 會自動讀取 `render.yaml` 設定。如果是 "New > Web Service"，請務必手動填寫上述資訊。
+```bash
+streamlit run app.py
+```
 
-## 技術棧
+## 技術架構
 
--   [Streamlit](https://streamlit.io/)
--   [OpenAI API](https://openai.com/)
--   [Hugging Face Transformers (FinBERT)](https://huggingface.co/ProsusAI/finbert)
--   [Plotly](https://plotly.com/)
+- **Frontend**: Streamlit (Custom CSS for styling)
+- **NLP Model**: FinBERT (Hugging Face Transformers)
+- **LLM**: OpenAI GPT-3.5 Turbo
+- **Data Fetching**: Requests + BeautifulSoup
+
+## 專案結構
+
+- `app.py`: 主應用程式邏輯與 UI。
+- `financial_analyzer.py`: 核心分析類別（封裝了 FinBERT 與 OpenAI 呼叫）。
+- `test_automation.py`: 自動化測試腳本。
