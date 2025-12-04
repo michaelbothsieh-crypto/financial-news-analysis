@@ -157,7 +157,7 @@ with st.sidebar:
     # Display history in reverse order (newest first)
     for i, url in enumerate(reversed(st.session_state['history'])):
         if st.button(f"🔗 {url[:30]}...", key=f"hist_{i}", help=url):
-            st.session_state['url_input'] = url
+            st.session_state['main_url_input'] = url
             st.rerun()
 
 # Initialize Analyzer
@@ -190,13 +190,8 @@ st.markdown("---")
 col_main_1, col_main_2, col_main_3 = st.columns([1, 2, 1])
 
 with col_main_2:
-    # Check if we have a URL from history click
-    default_url = st.session_state.get('url_input', "")
-    # Clear the session state trigger to avoid stuck input
-    if 'url_input' in st.session_state:
-        del st.session_state['url_input']
-        
-    url_input = st.text_input("", value=default_url, placeholder="請在此貼上新聞連結...", label_visibility="collapsed")
+    # Main URL Input with Session State Key
+    url_input = st.text_input("", placeholder="請在此貼上新聞連結...", label_visibility="collapsed", key="main_url_input")
     
     # Check if API Key is available
     has_api_key = bool(user_api_key or os.getenv("OPENAI_API_KEY"))
@@ -265,7 +260,7 @@ if 'results' in st.session_state:
     # Back Button
     if st.button("⬅️ 返回首頁 (繼續瀏覽熱門新聞)", type="secondary"):
         del st.session_state['results']
-        st.session_state['url_input'] = ""
+        st.session_state['main_url_input'] = ""
         st.rerun()
         
     results = st.session_state['results']
@@ -383,7 +378,7 @@ else:
                 # Action Button
                 btn_key = f"trend_btn_{hash(item['title'])}"
                 if st.button("⚡ 分析", key=btn_key, use_container_width=True, disabled=not has_api_key):
-                    st.session_state['url_input'] = item['link']
+                    st.session_state['main_url_input'] = item['link']
                     st.session_state['trigger_analysis'] = True
                     st.rerun()
         
