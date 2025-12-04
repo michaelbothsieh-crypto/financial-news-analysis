@@ -262,6 +262,12 @@ if analyze_btn:
 
 # Results Dashboard
 if 'results' in st.session_state:
+    # Back Button
+    if st.button("⬅️ 返回首頁 (繼續瀏覽熱門新聞)", type="secondary"):
+        del st.session_state['results']
+        st.session_state['url_input'] = ""
+        st.rerun()
+        
     results = st.session_state['results']
     sentiment_label, sentiment_score = results['sentiment']
     info = results['info']
