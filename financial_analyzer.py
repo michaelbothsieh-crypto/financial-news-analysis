@@ -16,7 +16,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class FinancialAnalyzer:
     def __init__(self, api_key=None, model_provider="openai"):
-# ... (existing init code) ...
+        # Try to get API key from env if not provided
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.model_provider = model_provider
+        
+        # Initialize FinBERT pipeline
+        # Lazy loading: Don't load it here to save memory on startup
+        self.sentiment_pipeline = None
 
     def fetch_news_from_url(self, url):
         """
