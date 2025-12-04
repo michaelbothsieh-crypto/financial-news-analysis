@@ -10,15 +10,13 @@ import requests
 from googlenewsdecoder import new_decoderv1
 import yfinance as yf
 
+import urllib3
+# Suppress SSL warnings for scraper
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 class FinancialAnalyzer:
     def __init__(self, api_key=None, model_provider="openai"):
-        # Try to get API key from env if not provided
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        self.model_provider = model_provider
-        
-        # Initialize FinBERT pipeline
-        # Lazy loading: Don't load it here to save memory on startup
-        self.sentiment_pipeline = None
+# ... (existing init code) ...
 
     def fetch_news_from_url(self, url):
         """
@@ -40,9 +38,10 @@ class FinancialAnalyzer:
                     print(f"DEBUG: Error decoding Google News URL: {e}")
 
             headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
             }
-            response = requests.get(url, headers=headers, timeout=10)
+            # Disable SSL verification to handle sites with poor cert chains
+            response = requests.get(url, headers=headers, timeout=10, verify=False)
             response.raise_for_status()
             
             soup = BeautifulSoup(response.text, 'html.parser')
