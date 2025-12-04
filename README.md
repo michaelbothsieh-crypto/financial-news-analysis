@@ -47,11 +47,14 @@
 1.  將程式碼推送到 GitHub。
 2.  在 Render Dashboard 點擊 "New +" -> "Web Service"。
 3.  連結你的 GitHub Repository。
-4.  設定如下：
-    -   **Runtime**: Python 3
+4.  **設定如下 (手動輸入)**：
+    -   **Name**: `financial-news-analysis` (或您喜歡的名字)
+    -   **Runtime**: `Python 3`
     -   **Build Command**: `pip install -r requirements.txt`
     -   **Start Command**: `streamlit run app.py --server.port $PORT --server.address 0.0.0.0`
 5.  點擊 "Create Web Service"。
+
+> **注意**: 如果您是使用 "New > Blueprint" 匯入，Render 會自動讀取 `render.yaml` 設定。如果是 "New > Web Service"，請務必手動填寫上述資訊。
 
 ## 技術棧
 
