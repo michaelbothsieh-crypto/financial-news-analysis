@@ -28,6 +28,10 @@ class FinancialAnalyzer:
         Fetches news content from a given URL.
         """
         try:
+            # Block social media URLs that require login
+            if any(x in url.lower() for x in ["facebook.com", "twitter.com", "instagram.com", "youtube.com"]):
+                return "Error: 無法分析社群媒體連結 (需要登入或內容受限)。請選擇新聞網站連結。"
+
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
             }
@@ -190,12 +194,24 @@ class FinancialAnalyzer:
         try:
             feed = feedparser.parse(rss_url)
             news_items = []
-            for entry in feed.entries[:limit]:
+            
+            # Blocked domains that are hard to scrape or require login
+            blocked_domains = ["facebook.com", "twitter.com", "instagram.com", "youtube.com", "login"]
+            
+            for entry in feed.entries:
+                # Check if link contains any blocked domain
+                if any(domain in entry.link.lower() for domain in blocked_domains):
+                    continue
+                
                 news_items.append({
                     "title": entry.title,
                     "link": entry.link,
                     "published": entry.published
                 })
+                
+                if len(news_items) >= limit:
+                    break
+                    
             return news_items
         except Exception as e:
             print(f"Error fetching trending news: {e}")
