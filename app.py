@@ -5,6 +5,9 @@ import time
 import os
 
 st.set_page_config(page_title="Financial Insights AI", layout="wide", page_icon="⚡")
+print("🚀 Starting Financial Insights AI...")
+if not os:
+    import os
 
 # Custom CSS for Neo-Modern "Independent Designer" Aesthetic
 st.markdown("""
